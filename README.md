@@ -7,3 +7,5 @@
 * ⏳ P1990 Add operator[] to std::initializer_list
     - [P1990R0](P1990/P1990R0.pdf)
 
+* ⏳ P2010 Remove iostream operators from P1889
+    - [P2010R0](P2010/P2010R0.pdf)
