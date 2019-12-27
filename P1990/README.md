@@ -1,10 +1,10 @@
 # Add `operator[]` to [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)
 
-Daniil Goncharov <neargye@gmail.com>
+Daniil Goncharov
 
-Antony Polukhin <antoshkka@gmail.com>
+Antony Polukhin
 
-## Full Text for Proposal
+## Full Text of Proposal
 * [P1990R0](P1990R0.pdf)
 
 ## References:

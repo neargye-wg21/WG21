@@ -1,10 +1,10 @@
 # Add Constexpr Modifiers to Functions in [`<cstring>`](https://en.cppreference.com/w/cpp/header/cstring) and [`<cwchar>`](https://en.cppreference.com/w/cpp/header/cwchar) Headers
 
-Daniil Goncharov <neargye@gmail.com>
+Daniil Goncharov
 
-Antony Polukhin <antoshkka@gmail.com>
+Antony Polukhin
 
-## Full Text for Proposal
+## Full Text of Proposal
 * [P1944R0](P1944R0.pdf)
 
 ## Proof of concept for \<cstring> and \<cwchar> functions
