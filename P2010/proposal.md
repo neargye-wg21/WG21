@@ -1,16 +1,16 @@
 Document number: P2010R0  
 Project: Programming Language C++  
-Audience: SG6 Numerics  
+Audience: SG6 Numerics, LEWGI  
 
 Daniil Goncharov <neargye@gmail.com>
 
-Date: 2019-12-25
+Date: 2019-12-27
 
 # Remove iostream operators from P1889
 
 ## I. Introduction and Motivation
 
-[P1889R0] includes `iostream` specializations and `std::to_string` overloads for numerics types. As was noted by LEWGI in Belfast iostreams may not be the best IO interface in C++20. `std::format` provides a more general formatting and parse functionality, `std::to_chars` and `std::from_chars` provide a more basic formatting and parsing functionality that could be used in freestanding environments.
+[P1889R0] includes `iostream` specializations and `std::to_string` overloads for numerics types. As was noted by LEWGI in Belfast iostreams may not be the best IO interface to start with in C++20. `std::format` provides a more general formatting and parse functionality, `std::to_chars` and `std::from_chars` provide a more basic formatting and parsing functionality that could be used in freestanding environments.
 
 We propose revising the output and input APIs from [P1889R0].
 
@@ -37,7 +37,7 @@ Implementation of `std::format` for integer types usually requires `to_chars` an
 [P1889R0] primarily includes integer types, therefore the description of `to_chars` and `from_chars` functions can be based on descriptions of already implemented overloads.
 
 ## III. Conclusions
-`to_chars` and `from_chars` are the basic building block for formatting. For integral types they are simple implement and provide a slodid base for future extensions.
+`to_chars` and `from_chars` are the basic building block for formatting. For integral types they are simple implement and provide a solid base for future extensions.
 
 Other ways of formatting from [P1889R0] are inconsistent or broken. We propose to remove them for now.
 
@@ -151,16 +151,16 @@ from_chars_result from_chars(const char* first, const char* last,
 ```
 </font>
 
-## VI. Revision History
+## V. Revision History
 
 Revision 0:
 
 * Initial proposal
 
-## VII. Acknowledgements
+## VI. Acknowledgements
 
 Thanks to Antony Polukhin and Alexander Zaitsev for reviewing the paper and providing valuable feedback.
 
-## VIII. References:
+## VII. References:
 * [P1889R0] C++ Numerics Work In Progress <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1889r0.pdf>.
 * [N4842] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/releases/download/n4842/n4842.pdf>
