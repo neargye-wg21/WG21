@@ -5,7 +5,9 @@ Daniil Goncharov
 Antony Polukhin
 
 ## Full Text of Proposal
+
 * [P1990R0](P1990R0.pdf)
 
-## References:
-* https://stdcpp.ru/proposals/28997cca-3e6d-4c85-9a68-b7ecc43e58b5
+## References
+
+* <https://stdcpp.ru/proposals/28997cca-3e6d-4c85-9a68-b7ecc43e58b5>
