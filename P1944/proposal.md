@@ -1,3 +1,13 @@
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: left;
+  padding: 10px;
+  border-spacing: 0px;
+}
+</style>
+
 Document number: P1944R1  
 Project: Programming Language C++  
 Audience: LEWGI, LEWG, LWG
@@ -6,7 +16,7 @@ Daniil Goncharov <neargye@gmail.com>
 
 Antony Polukhin <antoshkka@gmail.com>
 
-Date: 2020-02-13
+Date: 2020-02-26
 
 # Add Constexpr Modifiers to Functions in \<cstring> and \<cwchar> Headers
 
@@ -17,9 +27,9 @@ Headers `<cstring>` and `<cwchar>` have popular functions for string manipulatio
 Consider the simple example:
 
 ```cpp
-int main() {  
-    constexpr char str[] = "abcd"; // OK  
-    constexpr auto str_len = std::strlen(str); // Fail  
+int main() {
+    constexpr char str[] = "abcd"; // OK
+    constexpr auto str_len = std::strlen(str); // Fail
 }
 ```
 
@@ -34,6 +44,7 @@ This proposal is a pure library extension. It proposes changes to existing heade
 All the functions from `<cstring>` header must be marked with `constexpr`, except the `strcoll`, `strxfrm`, `strtok`, `strerror` functions.
 
 `strcoll`, `strxfrm` use locale that is non usable in `constexpr` context. `strtok` touches a static or global variable. `strerror` touches a thread local buffer and also can not be made `constexpr`.
+Other functions by C standard do not use locale see 7.11.1.1 [N1570].
 
 ### B. `std::memchr`, `std::memcmp`, `std::memchr`, `std::memset`, `std::memcpy`, `std::memmove` must have `constexpr` additions
 
@@ -41,15 +52,21 @@ All the functions from `<cstring>` header must be marked with `constexpr`, excep
 
 However those functions are not only popular, but also are widely used across Standard Library to gain better performance. Not making them `constexpr` will force standard Library developer to have compiler intrinsics for them anyway. This is a hard step that must be done.
 
-Clang already support `constexpr` `__builtin_memchr`, `__builtin_memcmp`, `__builtin_memcpy`, `__builtin_memmove` <https://reviews.llvm.org/rL338941>.
-
-Note that `std::bit_cast` and `std::is_constant_evaluated` could be used to implement those functions in pure C++ (in theory).
+Clang already support `constexpr` `__builtin_memchr`, `__builtin_memcmp`, `__builtin_memcpy`, `__builtin_memmove` <https://reviews.llvm.org/rL338941>.  
+GCC already support `constexpr` `__builtin_mem*` <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80265>.  
 
 ### C. Apply the `constexpr` to the analogs in `<cwchar>`
 
 As well as similar functions from `<cstrings>` for char, these functions from `<cwchar>` are useful when working with `wchar_t` in `constexpr`. Note that we do not propose to constexprify the functons that touch global state or work with locales.
 
-## IV. Proposed wording relative to n4835
+### D. ABI compatibility
+
+For compatibility ABI compilers can mark `constexpr` functions from `<cstring>` and `<cwchar>` as "special functions" and in constexpr-context return compile-time result, in runtime regular function call. For example, this can be done using `__builtin_*`. Majority compilers have `__builtin_*` analog for most function from `<cstring>`.
+
+Implementations that use native C++ specific functions in `<cstring>` and `<cwchar>`, could mark functions `constexpr` without ABI break.  
+Note that `std::bit_cast` and `std::is_constant_evaluated` could be used to implement those functions in pure C++ (in theory).
+
+## IV. Proposed wording relative to [N4835]
 
 Modifications to "21.5 Null-terminated sequence utilities" [c.strings]
 
@@ -167,24 +184,48 @@ size_t wcsxfrm(wchar_t* s1, const wchar_t* s2, size_t n);
 
 ### C. Modify to "17.3.2 Header <version> synopsis" [version.syn]
 
-<font color='green'>
-\#define __cpp_lib_constexpr_cstring _DATE OF ADOPTION_  
-\#define __cpp_lib_constexpr_cwchar _DATE OF ADOPTION_  
-</font>
+<font color='green'>#define __cpp_lib_constexpr_cstring _DATE OF ADOPTION_</font>
+
+<font color='green'>#define __cpp_lib_constexpr_cwchar _DATE OF ADOPTION_</font>
+
+<div style="page-break-after: always; visibility: hidden">
+\pagebreak
+</div>
 
 ## V. Revision History
 
 Revision 0:
 
 * Initial proposal
+* Prague voting
+
+  * We think this is important enough that we want to spend more time on this problem.
+
+    | SF | WF | B | WA | SA |
+    |----|----|---|----|----|
+    | 8  | 6  | 1 | 1  | 0  |
+
+  * We want to add `std::strtok(char*, char*, char**)`.
+
+    | SF | WF | B | WA | SA |
+    |----|----|---|----|----|
+    | 2  | 4  | 5 | 4  | 0  |
+
+  * Resolution
+    * Remove `std::strtok(char*, char*, char**)`.
+    * Find the prior discussions on adding constexpr to `<cstuff>` headers, consult implementors, and add what you learn to the next revision.
+    * Consult SG16 on this paper regarding locales.
 
 Revision 1:
 
+* Add notice about locale.
 * Remove `strtok(char* str, const char* delim, char** ptr)`.
-* Updated order of the functions in the proposal for matches the order in the N4835.
+* Add paragraph about ABI compatibility.
+* Updated order functions in the proposal for matches the order in the [N4835].
 
 ## VI. References
 
 * [N4835] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/raw/master/papers/n4835.pdf>.
+* [N1570] Committee Draft, Standard for Programming Language C. Available online at <http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf>
 * [neargye] Proof of concept for \<cstring> and \<cwchar> functions <https://github.com/Neargye/cstring-constexpr-proposal>.
 * [P0202R0] A Proposal to Add Constexpr Modifiers to Functions in \<cwchar> and \<cstring> Headers <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0202r0.html>.
