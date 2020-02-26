@@ -61,10 +61,9 @@ As well as similar functions from `<cstrings>` for char, these functions from `<
 
 ### D. ABI compatibility
 
-For compatibility ABI compilers can mark `constexpr` functions from `<cstring>` and `<cwchar>` as "special functions" and in constexpr-context return compile-time result, in runtime regular function call. For example, this can be done using `__builtin_*`. Majority compilers have `__builtin_*` analog for most function from `<cstring>`.
+Implementations that use their own C++ implementation of `<cstring>` and `<cwchar>` as per [using.linkage] p2 <http://eel.is/c++draft/library#using.linkage-2>, could mark functions constexpr without ABI break.
 
-Implementations that use native C++ specific functions in `<cstring>` and `<cwchar>`, could mark functions `constexpr` without ABI break.  
-Note that `std::bit_cast` and `std::is_constant_evaluated` could be used to implement those functions in pure C++ (in theory).
+Implementations that use the С standard library and use "C" linkage for the `<cstring>` and `<cwchar>` headers could also avoid ABI break. One of the solutions is to special case `<cstring>` and `<cwchar>` functions at the compiler level. In that case in constexpr-context compiler will return compile-time result, in runtime compiler will emit regular C function call.
 
 ## IV. Proposed wording relative to [N4835]
 
