@@ -16,7 +16,7 @@ Daniil Goncharov <neargye@gmail.com>
 
 Antony Polukhin <antoshkka@gmail.com>
 
-Date: 2020-02-26
+Date: 2020-03-28
 
 # Add Constexpr Modifiers to Functions in \<cstring> and \<cwchar> Headers
 
@@ -181,7 +181,7 @@ size_t wcsxfrm(wchar_t* s1, const wchar_t* s2, size_t n);
 
 <font color='green'>constexpr</font> wchar_t* wmemset(wchar_t* s, wchar_t c, size_t n);
 
-### C. Modify to "17.3.2 Header <version> synopsis" [version.syn]
+### C. Modify to "17.3.2 Header \<version> synopsis" [version.syn]
 
 <font color='green'>#define __cpp_lib_constexpr_cstring _DATE OF ADOPTION_</font>
 
@@ -196,6 +196,7 @@ size_t wcsxfrm(wchar_t* s1, const wchar_t* s2, size_t n);
 Revision 0:
 
 * Initial proposal
+
 * Prague voting
 
   * We think this is important enough that we want to spend more time on this problem.
@@ -210,7 +211,7 @@ Revision 0:
     |----|----|---|----|----|
     | 2  | 4  | 5 | 4  | 0  |
 
-  * Resolution
+  * Consensus: Bring a revision of P1944R0 (constexpr `<cstring>` and `<cwchar>`), with the guidance below, to LEWGI for further design review.
     * Remove `std::strtok(char*, char*, char**)`.
     * Find the prior discussions on adding constexpr to `<cstuff>` headers, consult implementors, and add what you learn to the next revision.
     * Consult SG16 on this paper regarding locales.
