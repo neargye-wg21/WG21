@@ -16,13 +16,13 @@ Daniil Goncharov <neargye@gmail.com>
 
 Antony Polukhin <antoshkka@gmail.com>
 
-Date: 2020-03-28
+Date: 2020-04-07
 
-# Add operator[] to std::initializer_list
+# Make `std::initialzier_list` satisfy `ContiguousView`
 
 ## I. Introduction and Motivation
 
-`std::initializer_list` s a lightweight proxy object that provides access to an array of objects of type `const T`, but access to objects by index in the current version is difficult. Therefore, it is proposed to add an `operator[]` to `std::initializer_list`.
+`std::initializer_list` is a lightweight proxy object that provides access to an array of objects of type `const T`, but access to objects by index in the current version is difficult. Therefore, it is proposed to add an `operator[]` to `std::initializer_list`.
 
 Consider the simple example:
 
@@ -62,6 +62,8 @@ constexpr const E* begin() const noexcept;
 constexpr const E* end() const noexcept;  
 
 <font color='green'>constexpr const E& operator\[](size_type idx) const;</font>  
+
+<font color='green'>constexpr const E* data() const noexcept;</font>  
 };
 
 // 17.10.4, initializer list range access  
@@ -86,6 +88,9 @@ constexpr size_t size() const noexcept;
 <font color='green'>5 Preconditions: idx < size() is true.</font>  
 <font color='green'>6 Returns: *(begin() + idx).</font>  
 <font color='green'>7 Throws: Nothing.</font>  
+
+<font color='green'>constexpr const E* data() const noexcept;</font>  
+<font color='green'>8 Returns: begin().</font>  
 
 ### C. Modify to "17.3.2 Header \<version> synopsis" [version.syn]
 
@@ -113,6 +118,11 @@ Revision 0:
     * Fix the first example in the comparison table; the left hand side is structurally different from the right (check with Conor Hoekstra for details).
     * Check if these changes will make `std::initializer_list` satisfy `ContiguousView`; if so, consider changing the title of the paper to "Make `std::initialzier_list` satisfy `ContiguousView`".
     * Sanity check this with someone knowledgable in EWG(I) to make sure this change doesn't have any language implications.
+
+Revision 1:
+
+* Add `data()`.
+* Changing the title of the paper to "Make `std::initialzier_list` satisfy `ContiguousView`".
 
 ## V. References
 
