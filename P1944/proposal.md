@@ -7,7 +7,6 @@ table, th, td {
   border-spacing: 0px;
 }
 </style>
-
 Document number: P1944R1  
 Project: Programming Language C++  
 Audience: LEWGI, LEWG, LWG
@@ -27,8 +26,8 @@ Consider the simple example:
 
 ```cpp
 int main() {
-    constexpr char str[] = "abcd"; // OK
-    constexpr auto str_len = std::strlen(str); // Fail
+  constexpr char str[] = "abcd"; // OK
+  constexpr auto str_len = std::strlen(str); // Fail
 }
 ```
 
