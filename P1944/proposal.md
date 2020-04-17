@@ -12,8 +12,7 @@ Document number: P1944R1
 Project: Programming Language C++  
 Audience: LEWGI, LEWG, LWG
 
-Daniil Goncharov <neargye@gmail.com>
-
+Daniil Goncharov <neargye@gmail.com>  
 Antony Polukhin <antoshkka@gmail.com>
 
 Date: 2020-03-28
