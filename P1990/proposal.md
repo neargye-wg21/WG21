@@ -7,29 +7,27 @@ table, th, td {
   border-spacing: 0px;
 }
 </style>
-
 Document number: P1990R1  
 Project: Programming Language C++  
 Audience: LEWGI, LEWG, LWG  
 
-Daniil Goncharov <neargye@gmail.com>
-
+Daniil Goncharov <neargye@gmail.com>  
 Antony Polukhin <antoshkka@gmail.com>
 
-Date: 2020-04-07
+Date: 2020-04-17
 
 # Make `std::initialzier_list` satisfy `ContiguousView`
 
 ## I. Introduction and Motivation
 
-`std::initializer_list` is a lightweight proxy object that provides access to an array of objects of type `const T`, but access to objects by index in the current version is difficult. Therefore, it is proposed to add an `operator[]` to `std::initializer_list`.
+`std::initializer_list` is a lightweight proxy object that provides access to an array of objects of type `const T`, but access to objects by index is difficult. In the current version `std::initializer_list` satisfies the concept `std::ranges::contiguous_range`, but don't has `operator[]` nor `data`. Therefore, it is proposed to add an `operator[]` and `data` to `std::initializer_list`.
 
 Consider the simple example:
 
 | Before | After |
 |--------|-------|
-| <pre><code><font size="1"><br>struct Vector3 {<br>  int x, y, z;<br><br>  Vector3(std::initializer_list\<int> il) {<br>    std::size_t idx = 0;<br>    for (auto i : il) {<br>      if (idx == 0) {<br>        x = i;<br>      } else if (idx == 1) {<br>        y = i;<br>      } else if (idx == 2) {<br>        z = i;<br>      }<br>      ++idx;<br>    }<br>  }<br>  ...<br>};<br></font></code></pre> | <pre><code><font size="1"><br>struct Vector3 {<br>  int x, y, z;<br><br>  Vector3(std::initializer_list\<int> il) {<br>    x = il[0];<br>    y = il[1];<br>    z = il[2];<br>  }<br>  ...<br>};<br></font></code></pre> |
-| <pre><code><font size="1"><br><br>class MultiIndexVector {<br>  using index_t = std::initializer_list\<std::size_t>;<br>  ...<br>  auto operator\[](index_t idx) {<br>    return std::make_tuple(data1[\*(idx.begin() + 0)],<br>                           data2[\*(idx.begin() + 1]));<br>  }<br>  ...<br>};<br></font></code></pre> | <br><pre><code><font size="1"><br>class MultiIndexVector {<br>  using index_t = std::initializer_list\<std::size_t>;<br>  ...<br>  auto operator\[](index_t idx) {<br>    return std::make_tuple(data1[idx[0]],<br>                           data2[idx[1]]);<br>  }<br>  ...<br>};<br></font></code></pre> |
+| <pre><code><font size="1"> struct Vector3 {<br>  int x, y, z;<br>  Vector3(std::initializer_list il) {<br>    x = *(il.begin() + 0);<br>    y = *(il.begin() + 1);<br>    z = *(il.begin() + 2);<br>  }<br>}; </font></code></pre> | <pre><code><font size="1"> struct Vector3 {<br>  int x, y, z;<br>  Vector3(std::initializer_list il) {<br>    x = il[0];<br>    y = il[1];<br>    z = il[2];<br>  }<br>}; </font></code></pre> |
+| <pre><code><font size="1">class MultiIndexVector {<br>  using index_t = std::initializer_list\<std::size_t>;<br>  auto operator\[](index_t idx) {<br>    return {data1[\*(idx.begin() + 0)],<br>            data2[\*(idx.begin() + 1)]};<br>  }<br>};</font></code></pre> | <pre><code><font size="1">class MultiIndexVector {<br>  using index_t = std::initializer_list\<std::size_t>;<br>  auto operator\[](index_t idx) {<br>    return {data1[idx[0]],<br>            data2[idx[1]]};<br>  }<br>};</font></code></pre> |
 
 ## II. Impact on the Standard
 
@@ -123,6 +121,7 @@ Revision 1:
 
 * Add `data()`.
 * Changing the title of the paper to "Make `std::initialzier_list` satisfy `ContiguousView`".
+* Fix "Example" and update "Introduction and Motivation".
 
 ## V. References
 
