@@ -59,7 +59,7 @@ As well as similar functions from `<cstrings>` for char, these functions from `<
 
 ### D. ABI compatibility
 
-Implementations that use their own C++ implementation of `<cstring>` and `<cwchar>` as per [using.linkage] p2 <http://eel.is/c++draft/library#using.linkage-2>, could mark functions constexpr without ABI break.
+Implementations that use their own C++ implementation of `<cstring>` and `<cwchar>` as per [using.linkage.2](http://eel.is/c++draft/library#using.linkage-2), could mark functions constexpr without ABI break.
 
 Implementations that use the С standard library and use "C" linkage for the `<cstring>` and `<cwchar>` headers could also avoid ABI break. One of the solutions is to special case `<cstring>` and `<cwchar>` functions at the compiler level. In that case in constexpr-context compiler will return compile-time result, in runtime compiler will emit regular C function call.
 
