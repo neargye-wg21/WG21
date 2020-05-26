@@ -9,31 +9,53 @@ table, th, td {
 </style>
 Document number: P1990R1  
 Project: Programming Language C++  
-Audience: LEWGI, LEWG, LWG  
+Audience: LEWG, LWG  
 
 Daniil Goncharov <neargye@gmail.com>  
 Antony Polukhin <antoshkka@gmail.com>
 
-Date: 2020-04-17
+Date: 2020-05-26
 
-# Make `std::initialzier_list` satisfy `ContiguousView`
+# Add operator[] and data() to std::initializer_list
 
 ## I. Introduction and Motivation
 
-`std::initializer_list` is a lightweight proxy object that provides access to an array of objects of type `const T`, but access to objects by index is difficult. In the current version `std::initializer_list` satisfies the concept `std::ranges::contiguous_range`, but don't has `operator[]` nor `data`. Therefore, it is proposed to add an `operator[]` and `data` to `std::initializer_list`.
+`std::initializer_list` is a lightweight proxy object that provides access to an array of objects of type `const T`, but fully use as array-proxy is difficult. Therefore, it is proposed to add an `operator[]` and `data` to `std::initializer_list`.
+<!--- http://eel.is/c++draft/support.initlist --->
 
-Consider the simple example:
+## II. Impact on the Standard
+
+This proposal is a pure library extension. It proposes changes to existing header `<initializer_list>` such that the changes do not break existing code and do not degrade performance. It does not require any changes in the core language in simple cases of non assembly optimized Standard Library, and it could be implemented in standard C++.
+
+## III. Design Decisions
+
+### A. Add `operator[]`
+
+Access to objects by index in the current version is difficult, Therefore, it is proposed to add an `operator[]` which can be easily implemented at the library level.
 
 | Before | After |
 |--------|-------|
 | <pre><code><font size="1"> struct Vector3 {<br>  int x, y, z;<br>  Vector3(std::initializer_list il) {<br>    x = *(il.begin() + 0);<br>    y = *(il.begin() + 1);<br>    z = *(il.begin() + 2);<br>  }<br>}; </font></code></pre> | <pre><code><font size="1"> struct Vector3 {<br>  int x, y, z;<br>  Vector3(std::initializer_list il) {<br>    x = il[0];<br>    y = il[1];<br>    z = il[2];<br>  }<br>}; </font></code></pre> |
 | <pre><code><font size="1">class MultiIndexVector {<br>  using index_t = std::initializer_list\<std::size_t>;<br>  auto operator\[](index_t idx) {<br>    return {data1[\*(idx.begin() + 0)],<br>            data2[\*(idx.begin() + 1)]};<br>  }<br>};</font></code></pre> | <pre><code><font size="1">class MultiIndexVector {<br>  using index_t = std::initializer_list\<std::size_t>;<br>  auto operator\[](index_t idx) {<br>    return {data1[idx[0]],<br>            data2[idx[1]]};<br>  }<br>};</font></code></pre> |
 
-## II. Impact on the Standard
+### B. Add `data()`
 
-This proposal is a pure library extension. It proposes changes to existing header `<initializer_list>` such that the changes do not break existing code and do not degrade performance. It does not require any changes in the core language in simple cases of non assembly optimized Standard Library, and it could be implemented in standard C++.
+`data()` allows to get more access to the array without using iterators.
 
-## III. Proposed wording relative to n4835
+### C. Satisfies concept `std::ranges::contiguous_range`
+
+In С++20 `std::initializer_list` satisfies concept `std::ranges::contiguous_range`, the addition of new methods will not affect code behavior with ranges.
+<!-- http://eel.is/c++draft/ranges#range.refinements-2 --->
+<!-- http://eel.is/c++draft/range.prim.data#2.4 --->
+
+```cpp
+template <std::ranges::contiguous_range R>
+void foo(R&& r) { /*...*/ }
+
+foo(std::initializer_list<int>{1, 2, 3}); // Ok in C++20.
+```
+
+## IV. Proposed wording relative to n4835
 
 Modifications to "27.10 Initializer lists" [support.initlist]
 
@@ -94,7 +116,7 @@ constexpr size_t size() const noexcept;
 
 <font color='green'>#define __cpp_lib_initializer_list _DATE OF ADOPTION_</font>
 
-## IV. Revision History
+## V. Revision History
 
 Revision 0:
 
@@ -120,9 +142,10 @@ Revision 0:
 Revision 1:
 
 * Add `data()`.
-* Changing the title of the paper to "Make `std::initialzier_list` satisfy `ContiguousView`".
 * Fix "Example" and update "Introduction and Motivation".
+* Add "Design Decisions".
+* Changing the title of the paper to "Add operator[] and data() to std::initializer_list".
 
-## V. References
+## VI. References
 
 * [N4835] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/raw/master/papers/n4835.pdf>
