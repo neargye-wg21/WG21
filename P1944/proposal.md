@@ -9,7 +9,7 @@ table, th, td {
 </style>
 Document number: P1944R1  
 Project: Programming Language C++  
-Audience: LEWGI, LEWG, LWG
+Audience: LEWGI, LEWG, LWG, SG16  
 
 Daniil Goncharov <neargye@gmail.com>  
 Antony Polukhin <antoshkka@gmail.com>
