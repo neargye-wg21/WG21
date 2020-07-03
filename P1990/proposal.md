@@ -14,7 +14,7 @@ Audience: LEWG, LWG
 Daniil Goncharov <neargye@gmail.com>  
 Antony Polukhin <antoshkka@gmail.com>
 
-Date: 2020-05-26
+Date: 2020-07-03
 
 # Add operator[] and data() to std::initializer_list
 
@@ -35,7 +35,7 @@ Access to objects by index in the current version is difficult, Therefore, it is
 
 | Before | After |
 |--------|-------|
-| <pre><code><font size="1"> struct Vector3 {<br>  int x, y, z;<br>  Vector3(std::initializer_list il) {<br>    x = *(il.begin() + 0);<br>    y = *(il.begin() + 1);<br>    z = *(il.begin() + 2);<br>  }<br>}; </font></code></pre> | <pre><code><font size="1"> struct Vector3 {<br>  int x, y, z;<br>  Vector3(std::initializer_list il) {<br>    x = il[0];<br>    y = il[1];<br>    z = il[2];<br>  }<br>}; </font></code></pre> |
+| <pre><code><font size="1"> struct Vector3 {<br>  int x, y, z;<br>  Vector3(std::initializer_list\<int> il) {<br>    x = *(il.begin() + 0);<br>    y = *(il.begin() + 1);<br>    z = *(il.begin() + 2);<br>  }<br>}; </font></code></pre> | <pre><code><font size="1"> struct Vector3 {<br>  int x, y, z;<br>  Vector3(std::initializer_list\<int> il) {<br>    x = il[0];<br>    y = il[1];<br>    z = il[2];<br>  }<br>}; </font></code></pre> |
 | <pre><code><font size="1">class MultiIndexVector {<br>  using index_t = std::initializer_list\<std::size_t>;<br>  auto operator\[](index_t idx) {<br>    return {data1[\*(idx.begin() + 0)],<br>            data2[\*(idx.begin() + 1)]};<br>  }<br>};</font></code></pre> | <pre><code><font size="1">class MultiIndexVector {<br>  using index_t = std::initializer_list\<std::size_t>;<br>  auto operator\[](index_t idx) {<br>    return {data1[idx[0]],<br>            data2[idx[1]]};<br>  }<br>};</font></code></pre> |
 
 ### B. Add `data()`
