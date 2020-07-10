@@ -1,8 +1,8 @@
-Document number: D????
-Project: Programming Language C++
+Document number: D????  
+Project: Programming Language C++  
 Audience: LEWGI, LEWG, LWG,
 
-Daniil Goncharov <neargye@gmail.com>
+Daniil Goncharov <neargye@gmail.com>  
 Karaev Alexander <akaraevz@mail.ru>
 
 Date: 2020-07-10
@@ -61,22 +61,36 @@ All the additions to the Standard are marked with <font color='green'>green</fon
 
 ### A. Modifications to "20.19.1 Header \<charconv> synopsis" [charconv.syn]
 
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, see below value, int base = 10);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, bool value, int base = 10) = delete;
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, float value);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, double value);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, long double value);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, float value, chars_format fmt);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, double value, chars_format fmt);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, float value, chars_format fmt, int precision);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, double value, chars_format fmt, int precision);
-<font color='green'>constexpr<font> to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt, int precision);
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, see below value, int base = 10);
 
-<font color='green'>constexpr<font> from_chars_result from_chars(const char* first, const char* last, see below & value, int base = 10);
-<font color='green'>constexpr<font> from_chars_result from_chars(const char* first, const char* last, float& value, chars_format fmt = chars_format::general);
-<font color='green'>constexpr<font> from_chars_result from_chars(const char* first, const char* last, double& value, chars_format fmt = chars_format::general);
-<font color='green'>constexpr<font> from_chars_result from_chars(const char* first, const char* last, long double& value, chars_format fmt = chars_format::general);
+to_chars_result to_chars(char* first, char* last, bool value, int base = 10) = delete;
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, float value);
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, double value);
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, long double value);
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, float value, chars_format fmt);
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, double value, chars_format fmt);
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt);
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, float value, chars_format fmt, int precision);
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, double value, chars_format fmt, int precision);
+
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt, int precision);
+
+
+<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, see below & value, int base = 10);
+
+<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, float& value, chars_format fmt = chars_format::general);
+
+<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, double& value, chars_format fmt = chars_format::general);
+
+<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, long double& value, chars_format fmt = chars_format::general);
 
 ### D. Modify to "17.3.2 Header \<version> synopsis" [version.syn]
 
