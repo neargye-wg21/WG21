@@ -1,48 +1,59 @@
-Document number: D????  
-Project: Programming Language C++  
-Audience: LEWGI, LEWG, LWG,  
+Document number: D????
+Project: Programming Language C++
+Audience: LEWGI, LEWG, LWG,
 
-Daniil Goncharov <neargye@gmail.com>  
+Daniil Goncharov <neargye@gmail.com>
 Karaev Alexander <akaraevz@mail.ru>
 
-Date: 2020-06-24
+Date: 2020-07-10
 
 # Add Constexpr Modifiers to Functions to_chars and from_chars in \<charconv> Header
 
 ## I. Introduction and Motivation
 
-There is currently no standard way to conversions between integers and strings and between floating-point numbers and strings in compile time.
+There is currently no standard way to make conversion between numbers and strings *at compile time*.
 
-`to_chars` and `from_chars` provide basic formatting and parsing functionality, locale-independent, no-throws and no memory allocation, so they look like logical candidate for constexpr string conversions. The paper proposes to make `to_chars` and `from_chars` functions usable in constexpr context.
+`to_chars` and `from_chars` are fundamental blocks for parsing and formatting being locale-independent and non-throwing without memory allocation, so they look like natural candidates for constexpr string conversions. The paper proposes to make `to_chars` and `from_chars` functions usable in constexpr context.
 
 Consider the simple example:
 
 ```cpp
-// Maybe c++2b
-int main() {
+
+constexpr std::optional<int> to_int(std::string_view s) {
+    int value;
+
+    if (auto [p, err] = std::from_chars(s.begin(), s.end(), value); err == std::errc{}) {
+        return value;
+    } else {
+        return std::nullopt;
+    }
 }
+
+static_assert(to_int("42") == 42);
+static_assert(to_int("foo") == std::nullopt);
 ```
 
 ## II. Design Decisions
 
-The discussion is based on the implementation of `to_chars` and `from_chars` from [Microsoft/STL](https://github.com/microsoft/STL), because it implements the algorithm integers and floating-point numbers.
+The discussion is based on the implementation of `to_chars` and `from_chars` from [Microsoft/STL](https://github.com/microsoft/STL), because it implements algorithm for integers and floating-point numbers.
 
-Based on [Microsoft/STL](https://github.com/microsoft/STL) version sience 2020-01-09 commit <https://github.com/microsoft/STL/commit/7ad0d63987668a91538408d120d6a2699f6a2abe>.
+During testing, the following changes were made to the original algorithm to make the implementation possible:
 
 ### Integers
 
-During testing, the possibility of implementing the following changes were made to the original algorithm:
-
-* `std::memcpy` will replased to copy in a loop. To maintain performance in a real implementation, can be used `std::char_traits<char>::copy`.
-* Some variables needed to be initialized by default. In C++20 we adopted [P1331](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1331r2.pdf), which eliminates these changes.
+* Replace `std::memcpy` with a raw loop. To maintain performance in a real implementation, one can use `std::char_traits<char>::copy`.
+* Zero initialize some variables. In C++20 we adopted [P1331](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1331r2.pdf), that eliminates these changes.
 
 ### Floating-point
 
-// TODO:
+* Replace `std::memcpy`, `std::memmove`, `std::memset` with a raw loop if `is_constant_evaluated`.
+* Zero initialize some variables. In C++20 we adopted [P1331](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1331r2.pdf), that eliminates these changes.
+* In the Microsoft/STL implementation not use `union` or `reinterpret_cast`, but only used `bit_cast` which constexpr in C++20.
+* Most conversion tables were already global inline constexpr constants, so no big changes were needed here. (Было всего 2 static constexpr таблицы внутри функций, но они были маленькие, не думаю что это большое изменение)
 
 ## III. Conclusions
 
-`to_chars` and `from_chars` are the basic building block for formatting, mark them `constexpr` we will add a standard way to work with formatting in compile time.
+`to_chars` and `from_chars` are basic building blocks for string formatting, so marking them `constexpr` provides a standard way for compile-time formatting.
 
 ## IV. Proposed Changes relative to N4861
 
