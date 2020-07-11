@@ -7,6 +7,7 @@ Antony Polukhin
 ## Full Text of Proposal
 
 * [P1944R0](P1944R0.pdf)
+* [P1944R1](P1944R1.pdf)
 
 ## Proof of concept for \<cstring> and \<cwchar> functions
 
