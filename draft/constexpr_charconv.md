@@ -5,7 +5,7 @@ Audience: LEWGI, LEWG, LWG,
 Daniil Goncharov <neargye@gmail.com>  
 Karaev Alexander <akaraevz@mail.ru>
 
-Date: 2020-07-10
+Date: 2020-11-17
 
 # Add Constexpr Modifiers to Functions to_chars and from_chars in \<charconv> Header
 
@@ -18,7 +18,6 @@ There is currently no standard way to make conversion between numbers and string
 Consider the simple example:
 
 ```cpp
-
 constexpr std::optional<int> to_int(std::string_view s) {
     int value;
 
@@ -33,21 +32,23 @@ static_assert(to_int("42") == 42);
 static_assert(to_int("foo") == std::nullopt);
 ```
 
-### Rationale and examples
-
-#### `constexpr std::format` and reflection
+### `constexpr std::format` and reflection
 
 In C++20 we adopted `constexpr std::string`, so we can already build strings at compile-time:
+
 ```cpp
 static_assert(std::string("Hello, ") + "world" + "!" == "Hello, world");
 ```
+
 The only non-constexpr dependency of `std::format` is `std::to_chars` so with current proposal we could mark `std::formatter<T>::parse` and even `std::formatter<T>::format` with `constexpr`.
+
 ```cpp
 // C++23?
 static_assert(std::format("The answer is {}", 42) == "The answer is 42");
 ```
 
 This can be very useful in context of reflection, i.e. to generate unique member names:
+
 ```cpp
 for (std::size_t i = 0; i < sizeof...(Ts); i++) {
     constexpr std::string member_name = std::format("field_{}", i);
@@ -57,34 +58,36 @@ for (std::size_t i = 0; i < sizeof...(Ts); i++) {
 
 By the way, it's possible even without `constexpr std::format`
 
-#### No standard way to parse integer from string at compile-time
+### No standard way to parse integer from string at compile-time
 
 There are too many ways to convert string-like object to number - `atol`, `sscanf`, `stoi`, `strto*l`, `istream` and the best C++17 alternative - `from_chars`. However, none of them are `constexpr`. This leads to numerous hand-made `constexpr int detail::parse_int(const char* str)` in libraries:
-- todo
-- todo
-- todo todo todo todo todooooo
+- TODO
+- TODO
+- TODO TODO TODO TODO TODO
 
 ## II. Design Decisions
 
-The discussion is based on the implementation of `to_chars` and `from_chars` from [Microsoft/STL](https://github.com/microsoft/STL), because it implements algorithm for integers and floating-point numbers. All the corresponding [tests](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) were *constexprified* and checked at compile-time.
+The discussion is based on the implementation of `to_chars` and `from_chars` from [Microsoft/STL](https://github.com/microsoft/STL), because it implements algorithm for integers and floating-point numbers.
 
 During testing, the following changes were made to the original algorithm to make the implementation possible:
+* Add constexpr modifiers to all functions
+* Replace internal assert-like macro with simple assert (`_Adl_verify_range`, `_STL_ASSERT`, `_STL_INTERNAL_CHECK`)
+* Replace `static constexpr` variables inside function scope with `constexpr`
+* Replace `std::memcpy`, `std::memmove`, `std::memset` with constexpr equivalents: `third_party::trivial_copy`,`third_party::trivial_move`, `third_party::trivial_fill`. To keep performance in a real implementation, one should use`std::is_constant_evaluated`
+* Replace `__float_to_bits`, `__double_to_bits`, `_Bit_cast` with `third_party::bit_cast`
+* Replace `_BitScanForward`, `_BitScanReverse` with `third_party::bit_scan_forward`, `third_party::bit_scan_reverse`
 
-* Basic
-    * Add constexpr modifiers to all functions
-    * Replace internal assert-like macro with simple assert (`_Adl_verify_range`, `_STL_ASSERT`, `_STL_INTERNAL_CHECK`)
-    * Replace `static constexpr` variables inside function scope with `constexpr`
-    * Replace type-punning usages of `union` and `reinterpret_cast` with constexpr `bit_cast`
-    * Implement `third_party::bit_cast` for IEEE-754 floating point types (for compilers without constexpr `std::bit_cast`)
-    * Replace `std::memcpy`, `std::memmove`, `std::memset` with constexpr equivalents: `third_party::trivial_copy`, `third_party::trivial_move`, `third_party::trivial_fill`. To keep performance in a real implementation, one should use `std::is_constant_evaluated`
-    * Zero initialize some variables (for compilers without C++20 support of [P1331](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1331r2.pdf))
+### Testing
 
-* Integers
-    * Add [[maybe_unused]] to _Uint_max, _Int_max, _Abs_int_min
+All the corresponding [tests](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) were *constexprified* and checked at compile-time and run-time.
+The modified version passes full [set tests from Microsoft/STL](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) test and some constexpr set tests.
 
-* Floating-point
-    * Implement `__float_to_bits`, `__double_to_bits`, `_Bit_cast` with `third_party::bit_cast`
-    * Replace `_BitScanForward`, `_BitScanReverse` with `third_party::bit_scan_forward`, `third_party::bit_scan_reverse`
+### Floating-point and Tables
+
+Microsoft/STL implemented using the Ryu algorithm, and the implementation is already done as a header only, tables are stored as constexpr arrays in the header <https://github.com/microsoft/STL/blob/2b4cf99c044176637497518294281046439a1bcc/stl/inc/xcharconv_ryu_tables.h>.
+Implementation does not use `union` nor `reinterpret_cast`, only `bit_cast` wich added in C++20 as `constexpr`.
+
+For some other STL implementations, storing large tables in headers may be a problem, for example for `float-128`. Perhaps this problem can be leveled by modules or not using tables at the compilation stage used `std::is_constant_evaluated`.
 
 ## III. Conclusions
 
@@ -145,4 +148,4 @@ Thanks to Antony Polukhin for reviewing the paper and providing valuable feedbac
 
 * [N4861] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/releases/download/n4861/n4861.pdf>
 * Microsoft's C++ Standard Library <https://github.com/microsoft/STL>, commit 2b4cf99c044176637497518294281046439a1bcc
-* [neargye] Proof of concept for `to_chars` and `from_chars` functions <https://github.com/Neargye/charconv-constexpr-proposal>
+* Proof of concept for `to_chars` and `from_chars` functions <https://github.com/Neargye/charconv-constexpr-proposal>
