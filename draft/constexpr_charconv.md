@@ -33,27 +33,62 @@ static_assert(to_int("42") == 42);
 static_assert(to_int("foo") == std::nullopt);
 ```
 
+### Rationale and examples
+
+#### `constexpr std::format` and reflection
+
+In C++20 we adopted `constexpr std::string`, so we can already build strings at compile-time:
+```cpp
+static_assert(std::string("Hello, ") + "world" + "!" == "Hello, world");
+```
+The only non-constexpr dependency of `std::format` is `std::to_chars` so with current proposal we could mark `std::formatter<T>::parse` and even `std::formatter<T>::format` with `constexpr`.
+```cpp
+// C++23?
+static_assert(std::format("The answer is {}", 42) == "The answer is 42");
+```
+
+This can be very useful in context of reflection, i.e. to generate unique member names:
+```cpp
+for (std::size_t i = 0; i < sizeof...(Ts); i++) {
+    constexpr std::string member_name = std::format("field_{}", i);
+    // use member_name
+}
+```
+
+By the way, it's possible even without `constexpr std::format`
+
+#### No standard way to parse integer from string at compile-time
+
+There are too many ways to convert string-like object to number - `atol`, `sscanf`, `stoi`, `strto*l`, `istream` and the best C++17 alternative - `from_chars`. However, none of them are `constexpr`. This leads to numerous hand-made `constexpr int detail::parse_int(const char* str)` in libraries:
+- todo
+- todo
+- todo todo todo todo todooooo
+
 ## II. Design Decisions
 
-The discussion is based on the implementation of `to_chars` and `from_chars` from [Microsoft/STL](https://github.com/microsoft/STL), because it implements algorithm for integers and floating-point numbers.
+The discussion is based on the implementation of `to_chars` and `from_chars` from [Microsoft/STL](https://github.com/microsoft/STL), because it implements algorithm for integers and floating-point numbers. All the corresponding [tests](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) were *constexprified* and checked at compile-time.
 
 During testing, the following changes were made to the original algorithm to make the implementation possible:
 
-### Integers
+* Basic
+    * Add constexpr modifiers to all functions
+    * Replace internal assert-like macro with simple assert (`_Adl_verify_range`, `_STL_ASSERT`, `_STL_INTERNAL_CHECK`)
+    * Replace `static constexpr` variables inside function scope with `constexpr`
+    * Replace type-punning usages of `union` and `reinterpret_cast` with constexpr `bit_cast`
+    * Implement `third_party::bit_cast` for IEEE-754 floating point types (for compilers without constexpr `std::bit_cast`)
+    * Replace `std::memcpy`, `std::memmove`, `std::memset` with constexpr equivalents: `third_party::trivial_copy`, `third_party::trivial_move`, `third_party::trivial_fill`. To keep performance in a real implementation, one should use `std::is_constant_evaluated`
+    * Zero initialize some variables (for compilers without C++20 support of [P1331](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1331r2.pdf))
 
-* Replace `std::memcpy` with a raw loop. To maintain performance in a real implementation, one can use `std::char_traits<char>::copy`.
-* Zero initialize some variables. In C++20 we adopted [P1331](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1331r2.pdf), that eliminates these changes.
+* Integers
+    * Add [[maybe_unused]] to _Uint_max, _Int_max, _Abs_int_min
 
-### Floating-point
-
-* Replace `std::memcpy`, `std::memmove`, `std::memset` with a raw loop if `is_constant_evaluated`.
-* Zero initialize some variables. In C++20 we adopted [P1331](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1331r2.pdf), that eliminates these changes.
-* In the Microsoft/STL implementation not use `union` or `reinterpret_cast`, but only used `bit_cast` which constexpr in C++20.
-* Most conversion tables were already global inline constexpr constants, so no big changes were needed here. (Было всего 2 static constexpr таблицы внутри функций, но они были маленькие, не думаю что это большое изменение)
+* Floating-point
+    * Implement `__float_to_bits`, `__double_to_bits`, `_Bit_cast` with `third_party::bit_cast`
+    * Replace `_BitScanForward`, `_BitScanReverse` with `third_party::bit_scan_forward`, `third_party::bit_scan_reverse`
 
 ## III. Conclusions
 
-`to_chars` and `from_chars` are basic building blocks for string formatting, so marking them `constexpr` provides a standard way for compile-time formatting.
+`to_chars` and `from_chars` are basic building blocks for string conversions, so marking them `constexpr` provides a standard way for compile-time parsing and formatting.
 
 ## IV. Proposed Changes relative to N4861
 
@@ -109,5 +144,5 @@ Thanks to Antony Polukhin for reviewing the paper and providing valuable feedbac
 ## VII. References
 
 * [N4861] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/releases/download/n4861/n4861.pdf>
-* Microsoft's C++ Standard Library <https://github.com/microsoft/STL>
-* [neargye] Proof of concept for `to_chars` and `from_chars` functions <https://github.com/Neargye/cstring-constexpr-proposal>
+* Microsoft's C++ Standard Library <https://github.com/microsoft/STL>, commit 2b4cf99c044176637497518294281046439a1bcc
+* [neargye] Proof of concept for `to_chars` and `from_chars` functions <https://github.com/Neargye/charconv-constexpr-proposal>
