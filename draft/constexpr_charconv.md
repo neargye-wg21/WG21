@@ -1,6 +1,6 @@
 Document number: D????  
 Project: Programming Language C++  
-Audience: LEWGI, LEWG, LWG,
+Audience: LEWGI, LEWG, LWG
 
 Daniil Goncharov <neargye@gmail.com>  
 Karaev Alexander <akaraevz@mail.ru>
@@ -51,7 +51,7 @@ This can be very useful in context of reflection, i.e. to generate unique member
 
 ```cpp
 for (std::size_t i = 0; i < sizeof...(Ts); i++) {
-    constexpr std::string member_name = std::format("field_{}", i);
+    constexpr std::string member_name = std::format("member_{}", i);
     // use member_name
 }
 ```
@@ -73,7 +73,7 @@ During testing, the following changes were made to the original algorithm to mak
 * Add constexpr modifiers to all functions
 * Replace internal assert-like macro with simple assert (`_Adl_verify_range`, `_STL_ASSERT`, `_STL_INTERNAL_CHECK`)
 * Replace `static constexpr` variables inside function scope with `constexpr`
-* Replace `std::memcpy`, `std::memmove`, `std::memset` with constexpr equivalents: `third_party::trivial_copy`,`third_party::trivial_move`, `third_party::trivial_fill`. To keep performance in a real implementation, one should use`std::is_constant_evaluated`
+* Replace `std::memcpy`, `std::memmove`, `std::memset` with constexpr equivalents: `third_party::trivial_copy`,`third_party::trivial_move`, `third_party::trivial_fill`. To keep performance in a real implementation, one should use `std::is_constant_evaluated`
 * Replace `__float_to_bits`, `__double_to_bits`, `_Bit_cast` with `third_party::bit_cast`
 * Replace `_BitScanForward`, `_BitScanReverse` with `third_party::bit_scan_forward`, `third_party::bit_scan_reverse`
 
@@ -84,10 +84,9 @@ The modified version passes full [set tests from Microsoft/STL](https://github.c
 
 ### Floating-point and Tables
 
-Microsoft/STL implemented using the Ryu algorithm, and the implementation is already done as a header only, tables are stored as constexpr arrays in the header <https://github.com/microsoft/STL/blob/2b4cf99c044176637497518294281046439a1bcc/stl/inc/xcharconv_ryu_tables.h>.
-Implementation does not use `union` nor `reinterpret_cast`, only `bit_cast` wich added in C++20 as `constexpr`.
+Microsoft/STL is implemented using the Ryu algorithm. This implementation is already header only with tables stored as constexpr arrays ([xcharconv_ryu_tables.h](https://github.com/microsoft/STL/blob/2b4cf99c044176637497518294281046439a1bcc/stl/inc/xcharconv_ryu_tables.h)). It doesn't use `union` nor `reinterpret_cast`, only `bit_cast` that was added in C++20 as `constexpr`.
 
-For some other STL implementations, storing large tables in headers may be a problem, for example for `float-128`. Perhaps this problem can be leveled by modules or not using tables at the compilation stage used `std::is_constant_evaluated`.
+For some other STL implementations, storing large tables in headers may become a problem (i.e. for `__float128` type). Perhaps this can be avoided by using modules or `std::is_constant_evaluated` to select tableless algorithm at compilation stage.
 
 ## III. Conclusions
 
@@ -120,7 +119,6 @@ to_chars_result to_chars(char* first, char* last, bool value, int base = 10) = d
 <font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, double value, chars_format fmt, int precision);
 
 <font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt, int precision);
-
 
 <font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, see below & value, int base = 10);
 
