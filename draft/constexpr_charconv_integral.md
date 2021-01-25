@@ -7,13 +7,14 @@ Karaev Alexander <akaraevz@mail.ru>
 
 Date: 2020-11-17
 
-# Add Constexpr Modifiers to Functions to_chars and from_chars in \<charconv> Header
+# Add Constexpr Modifiers to Functions to_chars and from_chars for Integral Types in \<charconv> Header
 
 ## I. Introduction and Motivation
 
 There is currently no standard way to make conversion between numbers and strings *at compile time*.
 
-`to_chars` and `from_chars` are fundamental blocks for parsing and formatting being locale-independent and non-throwing without memory allocation, so they look like natural candidates for constexpr string conversions. The paper proposes to make `to_chars` and `from_chars` functions usable in constexpr context.
+`std::to_chars` and `std::from_chars` are fundamental blocks for parsing and formatting being locale-independent and non-throwing without memory allocation, so they look like natural candidates for constexpr string conversions.
+The paper proposes to make `std::to_chars` and `std::from_chars` functions for **integral types** usable in constexpr context.
 
 Consider the simple example:
 
@@ -32,9 +33,11 @@ static_assert(to_int("42") == 42);
 static_assert(to_int("foo") == std::nullopt);
 ```
 
+⚠️We do **not** propose `constexpr` for floating-point overloads, see design choices below.
+
 ### `constexpr std::format` and reflection
 
-In C++20 we adopted `constexpr std::string`, so we can already build strings at compile-time:
+In C++20 `constexpr std::string` was adopted, so we can already build strings at compile-time:
 
 ```cpp
 static_assert(std::string("Hello, ") + "world" + "!" == "Hello, world");
@@ -67,26 +70,31 @@ There are too many ways to convert string-like object to number - `atol`, `sscan
 
 ## II. Design Decisions
 
-The discussion is based on the implementation of `to_chars` and `from_chars` from [Microsoft/STL](https://github.com/microsoft/STL), because it implements algorithm for integers and floating-point numbers.
+The discussion is based on the implementation of `to_chars` and `from_chars` from [Microsoft/STL](https://github.com/microsoft/STL), because it has full support of `<charconv>`.
 
 During testing, the following changes were made to the original algorithm to make the implementation possible:
 * Add constexpr modifiers to all functions
 * Replace internal assert-like macro with simple assert (`_Adl_verify_range`, `_STL_ASSERT`, `_STL_INTERNAL_CHECK`)
 * Replace `static constexpr` variables inside function scope with `constexpr`
 * Replace `std::memcpy`, `std::memmove`, `std::memset` with constexpr equivalents: `third_party::trivial_copy`,`third_party::trivial_move`, `third_party::trivial_fill`. To keep performance in a real implementation, one should use `std::is_constant_evaluated`
-* Replace `__float_to_bits`, `__double_to_bits`, `_Bit_cast` with `third_party::bit_cast`
-* Replace `_BitScanForward`, `_BitScanReverse` with `third_party::bit_scan_forward`, `third_party::bit_scan_reverse`
 
 ### Testing
 
 All the corresponding [tests](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) were *constexprified* and checked at compile-time and run-time.
 The modified version passes full [set tests from Microsoft/STL](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) test and some constexpr set tests.
 
-### Floating-point and Tables
+### Floating-point
 
-Microsoft/STL is implemented using the Ryu algorithm. This implementation is already header only with tables stored as constexpr arrays ([xcharconv_ryu_tables.h](https://github.com/microsoft/STL/blob/2b4cf99c044176637497518294281046439a1bcc/stl/inc/xcharconv_ryu_tables.h)). It doesn't use `union` nor `reinterpret_cast`, only `bit_cast` that was added in C++20 as `constexpr`.
+`std::from_chars`/`std::to_chars` are probably the most difficult to implement parts of a standard library.
+As of January 2021, only one of the three major implementations has full support of [P0067R5](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0067r5.html):
 
-For some other STL implementations, storing large tables in headers may become a problem (i.e. for `__float128` type). Perhaps this can be avoided by using modules or `std::is_constant_evaluated` to select tableless algorithm at compilation stage.
+| `Vendor`    | `<charconv>` support (according to cppreference.com)  |
+|-------------|-------------------------------------------------------|
+| `libstdc++` | ❌ no floating-point `std::to_chars`                   |
+| `libc++`    | ❌ no floating-point `std::from_chars`/`std::to_chars` |
+| `MS STL`    | ✔️full support                                      |
+
+So at least for now we don't propose `constexpr` for floating-point overloads.
 
 ## III. Conclusions
 
@@ -102,31 +110,31 @@ All the additions to the Standard are marked with <font color='green'>green</fon
 
 to_chars_result to_chars(char* first, char* last, bool value, int base = 10) = delete;
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, float value);
+to_chars_result to_chars(char* first, char* last, float value);
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, double value);
+to_chars_result to_chars(char* first, char* last, double value);
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, long double value);
+to_chars_result to_chars(char* first, char* last, long double value);
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, float value, chars_format fmt);
+to_chars_result to_chars(char* first, char* last, float value, chars_format fmt);
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, double value, chars_format fmt);
+to_chars_result to_chars(char* first, char* last, double value, chars_format fmt);
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt);
+to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt);
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, float value, chars_format fmt, int precision);
+to_chars_result to_chars(char* first, char* last, float value, chars_format fmt, int precision);
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, double value, chars_format fmt, int precision);
+to_chars_result to_chars(char* first, char* last, double value, chars_format fmt, int precision);
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt, int precision);
+to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt, int precision);
 
 <font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, see below & value, int base = 10);
 
-<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, float& value, chars_format fmt = chars_format::general);
+from_chars_result from_chars(const char* first, const char* last, float& value, chars_format fmt = chars_format::general);
 
-<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, double& value, chars_format fmt = chars_format::general);
+from_chars_result from_chars(const char* first, const char* last, double& value, chars_format fmt = chars_format::general);
 
-<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, long double& value, chars_format fmt = chars_format::general);
+from_chars_result from_chars(const char* first, const char* last, long double& value, chars_format fmt = chars_format::general);
 
 ### D. Modify to "17.3.2 Header \<version> synopsis" [version.syn]
 
@@ -146,4 +154,5 @@ Thanks to Antony Polukhin for reviewing the paper and providing valuable feedbac
 
 * [N4861] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/releases/download/n4861/n4861.pdf>
 * Microsoft's C++ Standard Library <https://github.com/microsoft/STL>, commit 2b4cf99c044176637497518294281046439a1bcc
-* Proof of concept for `to_chars` and `from_chars` functions <https://github.com/Neargye/charconv-constexpr-proposal>
+* Proof of concept for `to_chars` and `from_chars` functions for integral types <https://github.com/Neargye/charconv-constexpr-proposal/tree/integral>
+* [P0067R5] Elementary string conversions <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0067r5.html>
