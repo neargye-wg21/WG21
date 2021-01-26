@@ -63,9 +63,10 @@ for (std::size_t i = 0; i < sizeof...(Ts); i++) {
 
 There are too many ways to convert string-like object to number - `atol`, `sscanf`, `stoi`, `strto*l`, `istream` and the best C++17 alternative - `from_chars`. However, none of them are `constexpr`.
 This leads to numerous hand-made `constexpr int detail::parse_int(const char* str)` or `template <char...> constexpr int operator"" _foo()` in various libraries:
-- [`boost::multiprecision::literals`](https://github.com/boostorg/multiprecision/blob/develop/include/boost/multiprecision/cpp_int/literals.hpp) and similar examples with `constexpr` user-defined literals for *my-big-integer-type* construction at compile-time.
-- [`boost::metaparse::util::digit_to_int`](https://github.com/boostorg/metaparse/blob/master/include/boost/metaparse/v1/util/digit_to_int_c.hpp) - *yet another* `template <> struct digit_to_int_c<'0'> : boost::mpl::int_<0> {};`
-- [`ctre::pcre_actions::hexdec`](https://github.com/hanickadot/compile-time-regular-expressions/blob/main/include/ctre/actions/hexdec.inc.hpp) (compile time regular expressions) - number parsing is an important part of regex pattern processing.
+- [`boost::multiprecision`](https://github.com/boostorg/multiprecision/blob/develop/include/boost/multiprecision/cpp_int/literals.hpp) and similar examples with `constexpr` user-defined literals for *my-big-integer-type* construction at compile-time.
+- [`boost::metaparse`](https://github.com/boostorg/metaparse/blob/master/include/boost/metaparse/v1/util/digit_to_int_c.hpp) — *yet another* `template <> struct digit_to_int_c<'0'> : boost::mpl::int_<0> {};`
+- [`lexy`](https://github.com/foonathan/lexy/blob/main/include/lexy/dsl/integer.hpp) — parser combinator library with manually written `constexpr` `std::from_chars` equivalent for integers (any radix, overflow checks).
+- [`ctre`](https://github.com/hanickadot/compile-time-regular-expressions/blob/main/include/ctre/actions/hexdec.inc.hpp) (compile time regular expressions) — number parsing is an important part of regex pattern processing (`ctre::pcre_actions::hexdec`).
 
 ## II. Design Decisions
 
