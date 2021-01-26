@@ -43,23 +43,21 @@ In C++20 `constexpr std::string` was adopted, so we can already build strings at
 static_assert(std::string("Hello, ") + "world" + "!" == "Hello, world");
 ```
 
-The only non-constexpr dependency of `std::format` is `std::to_chars` so with current proposal we could mark `std::formatter<T>::parse` and even `std::formatter<T>::format` with `constexpr`.
+In addition, `std::format` was also adopted in C++20 and now its original author actively proposes various improvements like [P2216](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p2216r2.html) for compile-time format string checking.
+The current proposal is another step towards fully `constexpr std::format` which implies not only format string checking but also compile-time formatting (the only non-`constexpr` dependency of `std::format` is `<charconv>`):
 
 ```cpp
-// C++23?
-static_assert(std::format("The answer is {}", 42) == "The answer is 42");
+static_assert(std::format("Hello, C++{}!", 23) == "Hello, C++23!");
 ```
 
 This can be very useful in context of reflection, i.e. to generate unique member names:
 
 ```cpp
+// consteval function
 for (std::size_t i = 0; i < sizeof...(Ts); i++) {
-    constexpr std::string member_name = std::format("member_{}", i);
-    // use member_name
+    std::string member_name = std::format("member_{}", i);
 }
 ```
-
-By the way, it's possible even without `constexpr std::format`
 
 ### No standard way to parse integer from string at compile-time
 
@@ -92,7 +90,7 @@ As of January 2021, only one of the three major implementations has full support
 |-------------|-------------------------------------------------------|
 | `libstdc++` | ❌ no floating-point `std::to_chars`                   |
 | `libc++`    | ❌ no floating-point `std::from_chars`/`std::to_chars` |
-| `MS STL`    | ✔️full support                                      |
+| `MS STL`    | ✔️ full support                                     |
 
 So at least for now we don't propose `constexpr` for floating-point overloads.
 
