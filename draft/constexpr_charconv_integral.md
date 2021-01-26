@@ -80,8 +80,8 @@ During testing, the following changes were made to the original algorithm to mak
 
 ### Testing
 
-All the corresponding [tests](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) were *constexprified* and checked at compile-time and run-time.
-The modified version passes full [set tests from Microsoft/STL](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) test and some constexpr set tests.
+All the corresponding [tests](https://github.com/Neargye/charconv-constexpr-proposal/tree/integral/test) were *constexprified* and checked at compile-time and run-time.
+The modified version passes full [set tests from Microsoft/STL](https://github.com/microsoft/STL/tree/master/tests/std/tests/P0067R5_charconv) test.
 
 ### Floating-point
 
