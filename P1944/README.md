@@ -16,4 +16,4 @@ Antony Polukhin
 ## References
 
 * <https://stdcpp.ru/proposals/b6000ec7-9db8-41b1-9a1e-1fe00a424bbd>
-* <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0202r0.html>
+* <https://wg21.link/p0202>

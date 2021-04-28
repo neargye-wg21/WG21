@@ -8,4 +8,4 @@ Daniil Goncharov
 
 ## References
 
-* <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1889r0.pdf>
+* <https://wg21.link/p1889>
