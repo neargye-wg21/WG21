@@ -1,11 +1,21 @@
-Document number: P2291R0  
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: left;
+  padding: 10px;
+  border-spacing: 0px;
+}
+</style>
+
+Document number: P2291R1  
 Project: Programming Language C++  
 Audience: LEWGI, LEWG, LWG
 
 Daniil Goncharov <neargye@gmail.com>  
 Karaev Alexander <akaraevz@mail.ru>
 
-Date: 2021-01-26
+Date: 2021-04-28
 
 # Add Constexpr Modifiers to Functions to_chars and from_chars for Integral Types in \<charconv> Header
 
@@ -100,47 +110,72 @@ So at least for now we don't propose `constexpr` for floating-point overloads.
 
 `to_chars` and `from_chars` are basic building blocks for string conversions, so marking them `constexpr` provides a standard way for compile-time parsing and formatting.
 
-## IV. Proposed Changes relative to N4861
+<div style="page-break-after: always; visibility: hidden">
+\pagebreak
+</div>
+
+## IV. Proposed Changes relative to N4868
 
 All the additions to the Standard are marked with <font color='green'>green</font>.
 
 ### A. Modifications to "20.19.1 Header \<charconv> synopsis" [charconv.syn]
 
-<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, see below value, int base = 10);
+<pre><font size="1">
+// 20.19.3, primitive numerical input conversion
+struct from_chars_result {
+  const char* ptr;
+  errc ec;
+  friend bool operator==(const from_chars_result&, const from_chars_result&) = default;
+};
 
+<font color='green'>constexpr</font> to_chars_result to_chars(char* first, char* last, see below value, int base = 10);
 to_chars_result to_chars(char* first, char* last, bool value, int base = 10) = delete;
 
 to_chars_result to_chars(char* first, char* last, float value);
-
 to_chars_result to_chars(char* first, char* last, double value);
-
 to_chars_result to_chars(char* first, char* last, long double value);
 
 to_chars_result to_chars(char* first, char* last, float value, chars_format fmt);
-
 to_chars_result to_chars(char* first, char* last, double value, chars_format fmt);
-
 to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt);
 
-to_chars_result to_chars(char* first, char* last, float value, chars_format fmt, int precision);
+to_chars_result to_chars(char* first, char* last, float value,
+                         chars_format fmt, int precision);
+to_chars_result to_chars(char* first, char* last, double value,
+                         chars_format fmt, int precision);
+to_chars_result to_chars(char* first, char* last, long double value,
+                         chars_format fmt, int precision);
 
-to_chars_result to_chars(char* first, char* last, double value, chars_format fmt, int precision);
+// 20.19.3, primitive numerical input conversion
+struct from_chars_result {
+  const char* ptr;
+  errc ec;
+  friend bool operator==(const from_chars_result&, const from_chars_result&) = default;
+};
 
-to_chars_result to_chars(char* first, char* last, long double value, chars_format fmt, int precision);
+<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last,
+                                       see below & value, int base = 10);
 
-<font color='green'>constexpr</font> from_chars_result from_chars(const char* first, const char* last, see below & value, int base = 10);
-
-from_chars_result from_chars(const char* first, const char* last, float& value, chars_format fmt = chars_format::general);
-
-from_chars_result from_chars(const char* first, const char* last, double& value, chars_format fmt = chars_format::general);
-
-from_chars_result from_chars(const char* first, const char* last, long double& value, chars_format fmt = chars_format::general);
+from_chars_result from_chars(const char* first, const char* last, float& value,
+                             chars_format fmt = chars_format::general);
+from_chars_result from_chars(const char* first, const char* last, double& value,
+                             chars_format fmt = chars_format::general);
+from_chars_result from_chars(const char* first, const char* last, long double& value,
+                             chars_format fmt = chars_format::general);
+</font></pre>
 
 ### D. Modify to "17.3.2 Header \<version> synopsis" [version.syn]
 
-<font color='green'>#define __cpp_lib_to_chars _DATE OF ADOPTION_</font>
+<pre>
+<font color='green'>#define __cpp_lib_constexpr_charconv _DATE OF ADOPTION_</font>
+</pre>
 
 ## V. Revision History
+
+Revision 1:
+
+* Update the wording relative to [N4868]
+* Used `__cpp_lib_constexpr_charconv` as feature macro
 
 Revision 0:
 
@@ -152,7 +187,7 @@ Thanks to Antony Polukhin for reviewing the paper and providing valuable feedbac
 
 ## VII. References
 
-* [N4861] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/releases/download/n4861/n4861.pdf>
+* [N4868] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/raw/master/papers/n4868.pdf>
 * Microsoft's C++ Standard Library <https://github.com/microsoft/STL>, commit 2b4cf99c044176637497518294281046439a1bcc
 * Proof of concept for `to_chars` and `from_chars` functions for integral types <https://github.com/Neargye/charconv-constexpr-proposal/tree/integral>
 * [P0067R5] Elementary string conversions <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0067r5.html>
