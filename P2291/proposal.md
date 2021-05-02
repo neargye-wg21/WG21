@@ -106,6 +106,15 @@ As of January 2021, only one of the three major implementations has full support
 
 So at least for now we don't propose `constexpr` for floating-point overloads.
 
+### Other implementations
+
+[Check](https://github.com/Neargye/charconv-constexpr-proposal/tree/integral_llvm) of implementation `libc++`, the following changes were made to the original algorithm to make the implementation possible:
+  * Move utils functions from [charconv.cpp](https://github.com/llvm/llvm-project/blob/main/libcxx/src/charconv.cpp) to `charconv` header
+  * Replace `std::memcpy`, `std::memmove` with constexpr equivalents: `third_party::trivial_copy`,`third_party::trivial_move` or `bit_cast`
+  * Replace `std::log2f`  with constexpr equivalents
+
+[Quick check](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/std/charconv) of implementation `libstdc++`, showed that there are no blocking changes for implementation either.
+
 ## III. Conclusions
 
 `to_chars` and `from_chars` are basic building blocks for string conversions, so marking them `constexpr` provides a standard way for compile-time parsing and formatting.
@@ -180,6 +189,11 @@ Revision 1:
 Revision 0:
 
 * Initial proposal
+
+* Mailing list review Summary
+  * No implementation concerns for libstdc++, should be possible for libc++ too
+  * Please put the wording in code font
+  * Use `__cpp_lib_constexpr_charconv` as feature macro
 
 ## VI. Acknowledgements
 
