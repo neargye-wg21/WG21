@@ -7,6 +7,7 @@ Karaev Alexander
 ## Full Text of Proposal
 
 * [P2291R0](P2291R0.pdf)
+* [P2291R1](P2291R1.pdf)
 
 ## Proof of concept for `to_chars` and `from_chars` functions for integral types
 

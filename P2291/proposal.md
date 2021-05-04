@@ -10,12 +10,12 @@ table, th, td {
 
 Document number: P2291R1  
 Project: Programming Language C++  
-Audience: LEWGI, LEWG, LWG
+Audience: LEWG, LWG
 
 Daniil Goncharov <neargye@gmail.com>  
 Karaev Alexander <akaraevz@mail.ru>
 
-Date: 2021-04-28
+Date: 2021-05-04
 
 # Add Constexpr Modifiers to Functions to_chars and from_chars for Integral Types in \<charconv> Header
 

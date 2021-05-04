@@ -3,6 +3,7 @@
 * ⏳ [P2291](https://github.com/cplusplus/papers/issues/984) **Add Constexpr Modifiers to Functions `to_chars` and `from_chars` for Integral Types**
 
   * [P2291R0](P2291/P2291R0.pdf)
+  * [P2291R1](P2291/P2291R1.pdf)
   * [Proof of concept](https://github.com/Neargye/charconv-constexpr-proposal/tree/integral)
 
 * ⏳ [P1944](https://github.com/cplusplus/papers/issues/730) **Add Constexpr Modifiers to Functions in \<cstring> and \<cwchar> Headers**
