@@ -191,11 +191,11 @@ Revision 0:
   * Please put the wording in code font
   * Use `__cpp_lib_constexpr_charconv` as feature macro
 
-## VI. Acknowledgements
+## Acknowledgements
 
 Thanks to Antony Polukhin for reviewing the paper and providing valuable feedback.
 
-## VII. References
+## References
 
 * [N4868] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/raw/master/papers/n4868.pdf>
 * Microsoft's C++ Standard Library <https://github.com/microsoft/STL>, commit 2b4cf99c044176637497518294281046439a1bcc
