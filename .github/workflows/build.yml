@@ -1,0 +1,35 @@
+name: Build PDFs
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
+      - name: Install dependencies
+        run: |
+          sudo apt install texlive-xetex
+
+      - name: Build PDFs
+        run: |
+          cd P2291
+          make proposal.pdf
+          mv generated/proposal.pdf `grep -oP 'document: \KP.*' proposal.md`.pdf
+          git add *.pdf
+
+      - name: Publish PDFs
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "Update PDFs"
+          git push
