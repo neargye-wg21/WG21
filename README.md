@@ -6,6 +6,11 @@
   * [P2291R1](P2291/P2291R1.pdf)
   * [Proof of concept](https://github.com/Neargye/charconv-constexpr-proposal/tree/integral)
 
+* ⏳ [P1251](https://github.com/cplusplus/papers/issues/58) **A more constexpr bitset**
+
+  * [P1944R1](https://wg21.link/p1251)
+  * [P1944R2](P1944/P1944R2.pdf)
+
 * ⏳ [P1944](https://github.com/cplusplus/papers/issues/730) **Add Constexpr Modifiers to Functions in \<cstring> and \<cwchar> Headers**
 
   * [P1944R0](P1944/P1944R0.pdf)
