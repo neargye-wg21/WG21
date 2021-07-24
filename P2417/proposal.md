@@ -7,29 +7,21 @@ table, th, td {
   border-spacing: 0px;
 }
 </style>
-Document number: P1251R2  
+Document number: P2417R0  
 Project: Programming Language C++  
 Audience: LWG, LEWG  
 
-Morris Hafner <hafnermorris@gmail.com>  
 Daniil Goncharov <neargye@gmail.com>
 
-Date: 2021-04-21
+Date: 2021-07-24
 
 # A more constexpr bitset
 
 ## I. Changelog
 
-Changes between R2 and R1:
-  * Rebase on the [N4892]
-  * Revisit the `basic_string` `constexpr`’ness
-  * Update Motivation and section
+Revision 0:
 
-Changes between R1 and R0:
-  * Keep `bitset::reference::~reference()` and mark it as `constexpr` to
-  avoid ABI breakage as per LEWG feedback
-  * Remove the `basic_string_view` constructor as discussed on the Reflector
-  * Add reference to [P0980] as a potential future dependency
+* Revised [P1251] after [discussed in Cologne](https://github.com/cplusplus/papers/issues/58#issuecomment-513194409), because the original author is no longer active and non-responsive.
 
 ## II. Motivation
 
@@ -42,13 +34,13 @@ The lack of `constexpr` for most member functions was probably due to the nontri
 
 Mark every member function except iostream operators. Make all of `bitset::reference` constexpr.
 
-<div style="page-break-after: always; visibility: hidden">
-\pagebreak
-</div>
-
 ## IV. Impact on the Standard
 
 This proposal is a pure library addition.
+
+<div style="page-break-after: always; visibility: hidden">
+\pagebreak
+</div>
 
 ## V. Proposed wording
 
@@ -174,10 +166,15 @@ namespace std {
 
 ### B. Modify to "17.3.2 Header \<version> synopsis" [version.syn]
 
-<font color='green'>#define __cpp_lib_constexpr_bitset _DATE OF ADOPTION_</font>
+<font color='green'>#define __cpp_lib_constexpr_bitset _DATE OF ADOPTION_ // also in \<bitset> </font>
 
-## VI. References
+## VI. Acknowledgements
+
+Thanks to Morris Hafner for the work done on the original version of the paper [P1251].
+
+## VII. References
 
 * [n4892] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/releases/download/n4892/n4892.pdf>
+* [P1251] Morris Hafner: A more constexpr bitset <https://wg21.link/p1251>
 * [P0784] L. Dionne, R. Smith, N. Ranns, D.Vandevoorde: More constexpr containers <https://wg21.link/p0784>
 * [P0980] L. Dionne: Making std::string constexpr <https://wg21.link/p0980>
