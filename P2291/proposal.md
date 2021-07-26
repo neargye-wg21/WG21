@@ -189,6 +189,7 @@ from_chars_result from_chars(const char* first, const char* last, long double& v
 ## Revision History
 
 Revision 2:
+
 * Add missing modifications to [charconv.to.chars]/[charconv.from.chars]
 * Add missing comment to feature-test macro
 
