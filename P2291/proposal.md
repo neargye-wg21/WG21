@@ -1,14 +1,14 @@
 ---
 title: Add Constexpr Modifiers to Functions to_chars and from_chars for Integral Types in \<charconv> Header
-document: P2291R1
-date: 2021-05-04
+document: P2291R2
+date: 2021-07-26
 audience:
   - Library Evolution Working Group
   - Library Working Group
 author:
   - name: Daniil Goncharov
     email: <neargye@gmail.com>
-  - name: Karaev Alexander
+  - name: Alexander Karaev
     email: <akaraevz@mail.ru>
 ---
 
@@ -169,13 +169,28 @@ from_chars_result from_chars(const char* first, const char* last, long double& v
                              chars_format fmt = chars_format::general);
 ```
 
-### Modify to "17.3.2 Header \<version> synopsis" [version.syn]
+### Modifications to "20.19.2 Primitive numeric output conversion" [charconv.to.chars]
+```diff
+@[constexpr]{.add}@ to_chars_result to_chars(char* first, char* last, see below value, int base = 10);
+```
+
+### Modifications to "20.19.3 Primitive numeric input conversion" [charconv.from.chars]
+```diff
+@[constexpr]{.add}@ from_chars_result from_chars(const char* first, const char* last,
+                                       see below & value, int base = 10);
+```
+
+### Modifications to "17.3.2 Header \<version> synopsis" [version.syn]
 
 ```diff
-+ #define __cpp_lib_constexpr_charconv _DATE OF ADOPTION_
++ #define __cpp_lib_constexpr_charconv _DATE OF ADOPTION_ // also in <charconv>
 ```
 
 ## Revision History
+
+Revision 2:
+* Add missing modifications to [charconv.to.chars]/[charconv.from.chars]
+* Add missing comment to feature-test macro
 
 Revision 1:
 
