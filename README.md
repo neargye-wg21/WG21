@@ -6,7 +6,7 @@
   * [P2291R1](P2291/P2291R1.pdf)
   * [Proof of concept](https://github.com/Neargye/charconv-constexpr-proposal/tree/integral)
 
-* ⏳ [P2417](https://github.com/cplusplus/papers/issues/58) **A more constexpr bitset**
+* ⏳ [P2417](https://github.com/cplusplus/papers/issues/1087) **A more constexpr bitset**
 
   * [P2417R0](P2417/P2417R0.pdf)
 
