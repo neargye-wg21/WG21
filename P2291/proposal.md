@@ -118,6 +118,7 @@ So at least for now we don't propose `constexpr` for floating-point overloads.
 ## Conclusions
 
 `to_chars` and `from_chars` are basic building blocks for string conversions, so marking them `constexpr`{.cpp} provides a standard way for compile-time parsing and formatting.
+An implementation might prefer to provide this functionality via a compiler intrinsic, for performance and to reduce header bloat
 
 ## Proposed Changes relative to N4868
 
