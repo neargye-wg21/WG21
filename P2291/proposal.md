@@ -1,7 +1,7 @@
 ---
 title: Add Constexpr Modifiers to Functions to_chars and from_chars for Integral Types in \<charconv> Header
-document: P2291R2
-date: 2021-07-26
+document: P2291R3
+date: 2021-09-18
 audience:
   - Library Evolution Working Group
   - Library Working Group
@@ -118,6 +118,7 @@ So at least for now we don't propose `constexpr` for floating-point overloads.
 ## Conclusions
 
 `to_chars` and `from_chars` are basic building blocks for string conversions, so marking them `constexpr`{.cpp} provides a standard way for compile-time parsing and formatting.
+An implementation might prefer to provide this functionality via a compiler intrinsic, for performance and to reduce header bloat.
 
 ## Proposed Changes relative to N4868
 
@@ -187,6 +188,10 @@ from_chars_result from_chars(const char* first, const char* last, long double& v
 ```
 
 ## Revision History
+
+Revision 3:
+
+* Add a variant of implementation via compiler intrinsic.
 
 Revision 2:
 
