@@ -4,11 +4,15 @@
 
   * [P2291R0](P2291/P2291R0.pdf)
   * [P2291R1](P2291/P2291R1.pdf)
+  * [P2291R2](P2291/P2291R2.pdf)
+  * [P2291R3](P2291/P2291R3.pdf)
   * [Proof of concept](https://github.com/Neargye/charconv-constexpr-proposal/tree/integral)
 
 * ⏳ [P2417](https://github.com/cplusplus/papers/issues/1087) **A more constexpr bitset**
 
   * [P2417R0](P2417/P2417R0.pdf)
+  * [P2417R1](P2417/P2417R1.pdf)
+  * [Proof of concept](https://github.com/Neargye/bitset-constexpr-proposal)
 
 * ⏳ [P1944](https://github.com/cplusplus/papers/issues/730) **Add Constexpr Modifiers to Functions in \<cstring> and \<cwchar> Headers**
 

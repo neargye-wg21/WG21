@@ -7,17 +7,21 @@ table, th, td {
   border-spacing: 0px;
 }
 </style>
-Document number: P2417R0  
+Document number: P2417R1  
 Project: Programming Language C++  
 Audience: LWG, LEWG  
 
 Daniil Goncharov <neargye@gmail.com>
 
-Date: 2021-07-24
+Date: 2021-09-22
 
 # A more constexpr bitset
 
 ## I. Changelog
+
+Revision 1:
+
+* Add design decisions and proof of concept
 
 Revision 0:
 
@@ -34,15 +38,35 @@ The lack of `constexpr` for most member functions was probably due to the nontri
 
 Mark every member function except iostream operators. Make all of `bitset::reference` constexpr.
 
-## IV. Impact on the Standard
+## IV. Design Decisions
 
-This proposal is a pure library addition.
+The discussion is based on the implementation of `bitset` from [Microsoft/STL](https://github.com/microsoft/STL).
+
+During testing, the following changes were made to the implementation possible:
+
+* Replace `std::memcpy`, `std::memset` with loop.
+* Replace reinterpret_cast and _Bitsperbyte in bitset::count with loop with std::popcount.
+
+To keep performance in a real implementation, one should use `std::is_constant_evaluated` or `if consteval`.
 
 <div style="page-break-after: always; visibility: hidden">
 \pagebreak
 </div>
 
-## V. Proposed wording
+### Testing
+
+All the corresponding [tests](https://github.com/Neargye/bitset-constexpr-proposal/tree/master/test) were *constexprified* and checked at compile-time and run-time.
+The modified version passes [set tests from Microsoft/STL](https://github.com/microsoft/STL/blob/main/tests/tr1/tests/bitset/test.cpp) and [LLVM/libc++](https://github.com/llvm/llvm-project/tree/main/libcxx/test/std/utilities/template.bitset) tests.
+
+### Other implementations
+
+In `libstdc++` and `libc++` there is nothing in the implementation of `constexpr` `bitset` that goes beyond the existing capabilities of C++23.
+
+## V. Impact on the Standard
+
+This proposal is a pure library addition.
+
+## VI. Proposed wording
 
 ### A. Modifications to "20.9 Bitsets" [bitset]
 
@@ -77,10 +101,6 @@ template&lt;class charT, class traits, size_t N&gt;
 }
 </pre>
 
-<div style="page-break-after: always; visibility: hidden">
-\pagebreak
-</div>
-
 #### Change 20.9.2.1 of N4892 to the following:
 
 <pre>
@@ -102,7 +122,7 @@ namespace std {
       <font color='green'>constexpr</font> reference& flip() noexcept;                       // for b[i].flip();
     };
 
-    // 19.9.2.1, constructors
+    // 20.9.2.2, constructors
     constexpr bitset() noexcept;
     constexpr bitset(unsigned long long val) noexcept;
     template&lt;class charT, class traits, class Allocator&gt;
@@ -120,7 +140,7 @@ namespace std {
         charT zero = charT('0'),
         charT one = charT('1'));
 
-    // 19.9.2.2, bitset operations
+    // 20.9.2.3, bitset operations
     <font color='green'>constexpr</font> bitset&lt;N&gt;& operator&=(const bitset&lt;N&gt;& rhs) noexcept;
     <font color='green'>constexpr</font> bitset&lt;N&gt;& operator|=(const bitset&lt;N&gt;& rhs) noexcept;
     <font color='green'>constexpr</font> bitset&lt;N&gt;& operator^=(const bitset&lt;N&gt;& rhs) noexcept;
@@ -158,7 +178,7 @@ namespace std {
     <font color='green'>constexpr</font> bitset&lt;N&gt; operator&gt;&gt;(size_t pos) const noexcept;
   };
 
-  // 19.9.3, hash support
+  // 20.9.3, hash support
   template&lt;class T&gt; struct hash;
   template&lt;size_t N&gt; struct hash&lt;bitset&lt;N&gt;&gt;;
 }
@@ -168,13 +188,18 @@ namespace std {
 
 <font color='green'>#define __cpp_lib_constexpr_bitset _DATE OF ADOPTION_ // also in \<bitset> </font>
 
-## VI. Acknowledgements
+<div style="page-break-after: always; visibility: hidden">
+\pagebreak
+</div>
+
+## VII. Acknowledgements
 
 Thanks to Morris Hafner for the work done on the original version of the paper [P1251].
 
-## VII. References
+## VIII. References
 
 * [n4892] Working Draft, Standard for Programming Language C++. Available online at <https://github.com/cplusplus/draft/releases/download/n4892/n4892.pdf>
 * [P1251] Morris Hafner: A more constexpr bitset <https://wg21.link/p1251>
+* Proof of concept for `constexpr` `bitset` <https://github.com/Neargye/bitset-constexpr-proposal>
 * [P0784] L. Dionne, R. Smith, N. Ranns, D.Vandevoorde: More constexpr containers <https://wg21.link/p0784>
 * [P0980] L. Dionne: Making std::string constexpr <https://wg21.link/p0980>
