@@ -7,17 +7,19 @@ table, th, td {
   border-spacing: 0px;
 }
 </style>
-Document number: P2417R1  
+Document number: P2417R2  
 Project: Programming Language C++  
-Audience: LWG, LEWG  
-
-Daniil Goncharov <neargye@gmail.com>
-
-Date: 2021-09-22
+Audience: LWG  
+Daniil Goncharov <neargye@gmail.com>  
+Date: 2022-06-25  
 
 # A more constexpr bitset
 
 ## I. Changelog
+
+Revision 2:
+
+* Update proposed wording after [LWG review](https://github.com/cplusplus/papers/issues/1087#issuecomment-1159062809).
 
 Revision 1:
 
@@ -49,10 +51,6 @@ During testing, the following changes were made to the implementation possible:
 
 To keep performance in a real implementation, one should use `std::is_constant_evaluated` or `if consteval`.
 
-<div style="page-break-after: always; visibility: hidden">
-\pagebreak
-</div>
-
 ### Testing
 
 All the corresponding [tests](https://github.com/Neargye/bitset-constexpr-proposal/tree/master/test) were *constexprified* and checked at compile-time and run-time.
@@ -68,11 +66,11 @@ This proposal is a pure library addition.
 
 ## VI. Proposed wording
 
-### A. Modifications to "20.9 Bitsets" [bitset]
+### A. Modifications to [bitset]
 
 All the additions to the Standard are marked with <font color='green'>green</font>.
 
-#### Change 20.9.1 of N4892 to the following:
+#### Change [bitset.syn] to the following:
 
 <pre>
 #include &lt;string&gt;
@@ -101,7 +99,7 @@ template&lt;class charT, class traits, size_t N&gt;
 }
 </pre>
 
-#### Change 20.9.2.1 of N4892 to the following:
+#### Change [template.bitset.general] to the following:
 
 <pre>
 namespace std {
@@ -122,7 +120,7 @@ namespace std {
       <font color='green'>constexpr</font> reference& flip() noexcept;                       // for b[i].flip();
     };
 
-    // 20.9.2.2, constructors
+    // [bitset.cons], constructors
     constexpr bitset() noexcept;
     constexpr bitset(unsigned long long val) noexcept;
     template&lt;class charT, class traits, class Allocator&gt;
@@ -140,7 +138,7 @@ namespace std {
         charT zero = charT('0'),
         charT one = charT('1'));
 
-    // 20.9.2.3, bitset operations
+    // [bitset.members], bitset operations
     <font color='green'>constexpr</font> bitset&lt;N&gt;& operator&=(const bitset&lt;N&gt;& rhs) noexcept;
     <font color='green'>constexpr</font> bitset&lt;N&gt;& operator|=(const bitset&lt;N&gt;& rhs) noexcept;
     <font color='green'>constexpr</font> bitset&lt;N&gt;& operator^=(const bitset&lt;N&gt;& rhs) noexcept;
@@ -167,7 +165,7 @@ namespace std {
         to_string(charT zero = charT('0'), charT one = charT('1')) const;
 
     <font color='green'>constexpr</font> size_t count() const noexcept;
-    <font color='green'>constexpr</font> constexpr size_t size() const noexcept;
+    <font color='green'>constexpr</font> size_t size() const noexcept;
     <font color='green'>constexpr</font> bool operator==(const bitset&lt;N&gt;& rhs) const noexcept;
     <font color='green'>constexpr</font> bool operator!=(const bitset&lt;N&gt;& rhs) const noexcept;
     <font color='green'>constexpr</font> bool test(size_t pos) const;
@@ -178,13 +176,15 @@ namespace std {
     <font color='green'>constexpr</font> bitset&lt;N&gt; operator&gt;&gt;(size_t pos) const noexcept;
   };
 
-  // 20.9.3, hash support
+  // [bitset.hash], hash support
   template&lt;class T&gt; struct hash;
   template&lt;size_t N&gt; struct hash&lt;bitset&lt;N&gt;&gt;;
 }
 </pre>
 
-### B. Modify to "17.3.2 Header \<version> synopsis" [version.syn]
+Add constexpr to the detailed descriptions in [bitset.cons] and [bitset.members] for all functions that are not currently `constexpr`, and the first three detailed descriptions in [bitset.operators].
+
+### B. Modify to [version.syn]
 
 <font color='green'>#define __cpp_lib_constexpr_bitset _DATE OF ADOPTION_ // also in \<bitset> </font>
 
