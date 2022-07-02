@@ -8,6 +8,8 @@ Karaev Alexander
 
 * [P2291R0](P2291R0.pdf)
 * [P2291R1](P2291R1.pdf)
+* [P2291R2](P2291R2.pdf)
+* [P2291R3](P2291R3.pdf)
 
 ## Proof of concept for `to_chars` and `from_chars` functions for integral types
 
