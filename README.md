@@ -1,6 +1,6 @@
 # My proposals for the C++ standard
 
-* ⏳ [P2291](https://github.com/cplusplus/papers/issues/984) **Add Constexpr Modifiers to Functions `to_chars` and `from_chars` for Integral Types**
+* ✔ [P2291](https://github.com/cplusplus/papers/issues/984) **Add Constexpr Modifiers to Functions `to_chars` and `from_chars` for Integral Types**
 
   * [P2291](https://wg21.link/p2291)
   * [Proof of concept](https://github.com/Neargye/charconv-constexpr-proposal/tree/integral)
